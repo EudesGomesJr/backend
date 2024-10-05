@@ -2,6 +2,30 @@ const { Op } = require('sequelize');
 const UserModel = require('./models/UserModel');
 const PostsModel = require('./models/PostsModel');
 
+PostsModel.belongsTo(UserModel, {foreignKey: 'user_id'});
+
+async function execute() {
+
+let recentUser = await UserModel.create({
+    firstname: 'Eudes',
+    surname: 'Gomes',
+    username: 'eudes' + Math.random(),
+    email: 'eudes@gmail.com' + Math.random().toString(16).slice(2),
+    password: '123456'
+});
+
+await PostsModel.create({
+    user_id: recentUser.id,
+    title: "Aprendendo Css",
+    content: "Teste de Css"
+})
+
+let posts = await PostsModel.findOne({
+    include: UserModel
+});
+
+console.log(posts.UserModel.email);
+
 // UserModel.create({
 //     firstname: 'Eudes',
 //     surname: 'Gomes',
@@ -13,21 +37,7 @@ const PostsModel = require('./models/PostsModel');
 // });
 
 //UserModel.findAll().then(resultado => console.log(resultado));
-
-PostsModel.belongsTo(UserModel, {foreignKey: 'user_id'});
-
-async function execute() {
-//     await PostsModel.create({
-//         user_id: 1,
-//         title: "Aprendendo CSS",
-//         content: "Loren ipsum kdjf skjdl sljd testando algo mais ..."
-//     });
-
-let posts = await PostsModel.findOne({
-    include: UserModel
-});
-
-console.log(posts.UserModel.email);
+// console.log(posts.UserModel.email);
 
     /*
     // Inserindo informaçoes

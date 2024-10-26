@@ -1,21 +1,24 @@
 const express = require("express");
 const app = express();
 app.use(express.json()); // use é um midleware para manipular a requisição que transforma o body em json
-const fs = require('fs'); // fs = File System
-const { 
-    ListUsers, UserById, CreateUser, UpdateUser, DeleteUser
-} = require('./controllers/UserController');
+const fs = require("fs"); // fs = File System
+const {
+  ListUsers,
+  UserById,
+  CreateUser,
+  UpdateUser,
+  DeleteUser,
+} = require("./controllers/UserController");
 
-app.get('/', (request,response) => {
-    response.end("Api backend do blog"); // .end já identifica que se trata de um conteúdo HTML
-})
+app.get("/", (request, response) => {
+  response.end("Api backend do blog"); // .end já identifica que se trata de um conteúdo HTML
+});
 
-app.get('/users', ListUsers);
-app.get('/users/:id', UserById);
-app.post('/users', CreateUser);
-app.put('/users/:id', UpdateUser);
-app.delete('/users/:id', DeleteUser);
-
+app.get("/users", ListUsers);
+app.get("/users/:id", UserById);
+app.post("/users", CreateUser);
+app.put("/users/:id", UpdateUser);
+app.delete("/users/:id", DeleteUser);
 
 // app.get('/post/:slug', (request,response) => {
 //     //console.log(request.params.slug);

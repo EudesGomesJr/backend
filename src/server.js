@@ -10,6 +10,10 @@ const {
   DeleteUser,
 } = require("./controllers/UserController");
 
+const {
+  CreatePost
+} = require("./controllers/PostsController");
+
 app.get("/", (request, response) => {
   response.end("Api backend do blog"); // .end já identifica que se trata de um conteúdo HTML
 });
@@ -19,6 +23,8 @@ app.get("/users/:id", UserById);
 app.post("/users", CreateUser);
 app.put("/users/:id", UpdateUser);
 app.delete("/users/:id", DeleteUser);
+
+app.post("/posts", CreatePost);
 
 // app.get('/post/:slug', (request,response) => {
 //     //console.log(request.params.slug);

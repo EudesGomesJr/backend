@@ -1,75 +1,63 @@
-const { resolveObjectURL } = require("buffer");
-const PostsModel = require("../models/PostsModel");
 const fs = require("fs");
 const path = require("path");
+const PostsModel = require("../models/PostsModel");
+const {getImagePath, makeDirIfNotExists} = require('../utils/PathHandler');
+const {saveByBase64} = require('../service/imageUpload')
 
-const mimeTypeMap = {
-  "image/png": "png",
-  "image/jpg": "jpg",
-  "image/jpeg": "jpeg",
-  "image/webp": "webp",
-  "image/jfif": "jfif",
-};
+
 const CreatePost = async (request, response) => {
   let { type, mime, content } = request.body.image;
   let { user_id, title } = request.body;
 
-  let directory = path.resolve("static/images"); // path.resolve é uma forma do node passar o caminho do projeto
+  let directory =getImagePath();
   let filename = Math.random().toString(16).slice(2); //Gera números aleatórios usando hexadecimais
 
   try {
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory, { recursive: true });
-    }
+    makeDirIfNotExists(directory);
 
     if (!content || !type) {
       throw new Error("Body inválido");
     }
+
     if (type === "base64") {
+
       if (!mime) {
         throw new Error("Mime é obrigatório para o type base64");
       }
 
-      let extension = mimeTypeMap[mime];
-      if (!extension) {
-        throw new Error("Mime inválido");
-      }
+      filename = saveByBase64(filename, content, mime);
 
-      filename = `${filename}.${extension}`;
-      fs.writeFileSync(`${directory}/${filename}`, atob(content), {
-        encoding: "binary",
-      });
     } else if (type === "url") {
       let response = await fetch(content);
       let mimeType = response.headers.get("content-type");
       let extension = mimeTypeMap[mimeType];
+      if (!extension) {
+        throw new Error("Tipo de arquivo da url inválido");
+      }
 
       let buffer = await response.arrayBuffer();
       buffer = Buffer.from(buffer, "binary");
 
       filename = `${filename}.${extension}`;
-      console.log(filename);
-      console.log("======");
       fs.writeFileSync(`${directory}/${filename}`, buffer, {
         encoding: "binary",
       });
     } else {
+      response.status(400); // Erro dos dados informados pelo usuário
       throw new Error("Tipo inválido");
     }
 
     //return response.json({ message: "Arquivo criado com sucesso" });
 
-    await PostsModel.create({
+    let post = await PostsModel.create({
       user_id,
       title,
       image: filename,
     });
+    
+    return response.json(post); // Costuma-se devolver para o usuário o que foi gravado no BD 
 
-    response.status(201);
-    return response.json({ message: "Post criado com sucesso" }); // Como o padão de comunicação numa ApiRest é Json
   } catch (error) {
-    console.log(directory);
-    console.log(filename);
     if (fs.existsSync(`${directory}/${filename}`)) {
       fs.unlinkSync(`${directory}/${filename}`);
     }

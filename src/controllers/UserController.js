@@ -2,12 +2,16 @@ const UserModel = require("../models/UserModel");
 
 const CreateUser = async (request, response) => {
   try {
-    await UserModel.create(request.body);
+    let user = await UserModel.create(request.body);
+    user.setDataValue('password',undefined); // Retira a senha para não mostrá-la
     response.status(201);
-    return response.json({ message: "Usuário criado com sucesso" }); // Como o padão de comunicação numa ApiRest é Json
+    return response.json(user); // Substituiu a linha abaixo para padronizar o retorno do que foi gravado no banco
+    // return response.json({ message: "Usuário criado com sucesso" }); // Como o padão de comunicação numa ApiRest é Json
   } catch (error) {
-    console.log(error.message);
     response.status(400); // Erro dos dados informados pelo usuário
+    if(Array.isArray(error.errors) && error.errors.length > 0) {
+      return response.json({message: error.errors[0].message}) //Serve especificamente para o Sequelize
+    }
     return response.json({ message: "Erro ao criar usuário" });
   }
 };

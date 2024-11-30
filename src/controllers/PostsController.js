@@ -49,6 +49,12 @@ const CreatePost = async (request, response) => {
   }
 };
 
+const ListPosts = async (request, response) => {
+  let posts =  await PostsModel.findAll();
+  return response.json(posts);
+}
+
 module.exports = {
   CreatePost,
+  ListPosts
 };

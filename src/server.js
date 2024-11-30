@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 app.use(express.json()); // use é um midleware para manipular a requisição que transforma o body em json
+app.use(cors());
 const fs = require("fs"); // fs = File System
 const {
   ListUsers,
@@ -11,7 +12,8 @@ const {
 } = require("./controllers/UserController");
 
 const {
-  CreatePost
+  CreatePost,
+  ListPosts
 } = require("./controllers/PostsController");
 
 app.get("/", (request, response) => {
@@ -23,6 +25,7 @@ app.get("/users/:id", UserById);
 app.post("/users", CreateUser);
 app.put("/users/:id", UpdateUser);
 app.delete("/users/:id", DeleteUser);
+app.get('/posts', ListPosts);
 
 app.post("/posts", CreatePost);
 

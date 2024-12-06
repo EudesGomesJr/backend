@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 app.use(express.json()); // use é um midleware para manipular a requisição que transforma o body em json
 app.use(cors());
@@ -11,10 +12,7 @@ const {
   DeleteUser,
 } = require("./controllers/UserController");
 
-const {
-  CreatePost,
-  ListPosts
-} = require("./controllers/PostsController");
+const { CreatePost, ListPosts } = require("./controllers/PostsController");
 
 app.get("/", (request, response) => {
   response.end("Api backend do blog"); // .end já identifica que se trata de um conteúdo HTML
@@ -25,7 +23,7 @@ app.get("/users/:id", UserById);
 app.post("/users", CreateUser);
 app.put("/users/:id", UpdateUser);
 app.delete("/users/:id", DeleteUser);
-app.get('/posts', ListPosts);
+app.get("/posts", ListPosts);
 
 app.post("/posts", CreatePost);
 

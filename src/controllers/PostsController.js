@@ -1,4 +1,8 @@
+const UserModel = require('../models/UserModel');
 const PostsModel = require("../models/PostsModel");
+
+PostsModel.belongsTo(UserModel, {foreignKey: 'user_id', as: 'author'});  // Estabelece uma conexão entre tabelas pela chave estrangeiras
+
 const {
   getImagePath,
   makeDirIfNotExists,
@@ -8,7 +12,7 @@ const { saveByBase64, saveByUrl } = require("../service/imageUpload");
 
 const CreatePost = async (request, response) => {
   let { type, mime, content } = request.body.image;
-  let { user_id, title } = request.body;
+  let { user_id, title, content: postContent, slug } = request.body;
 
   let directory = getImagePath();
   let filename = Math.random().toString(16).slice(2); //Gera números aleatórios usando hexadecimais
@@ -36,7 +40,9 @@ const CreatePost = async (request, response) => {
     let post = await PostsModel.create({
       user_id,
       title,
+      slug,
       image: filename,
+      content: postContent
     });
 
     return response.json(post); // Costuma-se devolver para o usuário o que foi gravado no BD
@@ -50,7 +56,14 @@ const CreatePost = async (request, response) => {
 };
 
 const ListPosts = async (request, response) => {
-  let posts =  await PostsModel.findAll();
+  let posts =  await PostsModel.findAll({
+      include: {    // Inclui na chamada de post os dados do usuário, conforme conexão acima
+        model: UserModel,
+        attributes: ["username", "firstname", "surname", "fullname"],
+        as: 'author'
+      }   
+  }
+  );
   return response.json(posts);
 }
 

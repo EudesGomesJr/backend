@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const UserModel = require('./models/UserModel');
 const PostsModel = require('./models/PostsModel');
 
-PostsModel.belongsTo(UserModel, {foreignKey: 'user_id'});
+PostsModel.belongsTo(UserModel, {foreignKey: 'user_id'});  // Estabelece uma conexão entre tabelas pela chave estrangeiras
 
 async function execute() {
 
@@ -21,7 +21,7 @@ await PostsModel.create({
 })
 
 let posts = await PostsModel.findOne({
-    include: UserModel
+    include: UserModel   // Inclui na chamada de post os dados do usuário, conforme conexão acima
 });
 
 console.log(posts.UserModel.email);

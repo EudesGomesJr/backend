@@ -3,6 +3,8 @@ const cors = require("cors");
 const app = express();
 app.use(express.json()); // use é um midleware para manipular a requisição que transforma o body em json
 app.use(cors());
+app.use('/public', express.static('static')) // Este comando serve para informar que o diretório static, do servidor, 
+                                             // pode ser visto por qualque pessoa, acessando a pasta /public
 const fs = require("fs"); // fs = File System
 const {
   ListUsers,

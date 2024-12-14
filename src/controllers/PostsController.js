@@ -3,6 +3,11 @@ const PostsModel = require("../models/PostsModel");
 
 PostsModel.belongsTo(UserModel, {foreignKey: 'user_id', as: 'author'});  // Estabelece uma conexão entre tabelas pela chave estrangeiras
 
+const OrderMap = {
+  latest: "DESC",
+  oldest: "ASC"
+}
+
 const {
   getImagePath,
   makeDirIfNotExists,
@@ -56,7 +61,17 @@ const CreatePost = async (request, response) => {
 };
 
 const ListPosts = async (request, response) => {
+  let {limit, order} = request.query;
+
+  let orderSql = [];
+
+  if (order) {
+    orderSql = [["createdAt", OrderMap[order]]]
+  }
+
   let posts =  await PostsModel.findAll({
+      limit: limit ? Number(limit) : undefined,
+      order: orderSql,
       include: {    // Inclui na chamada de post os dados do usuário, conforme conexão acima
         model: UserModel,
         attributes: ["username", "firstname", "surname", "fullname"],
@@ -67,7 +82,23 @@ const ListPosts = async (request, response) => {
   return response.json(posts);
 }
 
+const PostBySlug = async (request, response) => {
+  let {slug} =  request.params;
+
+  let post = await PostsModel.findOne({
+    include: {    // Inclui na chamada de post os dados do usuário, conforme conexão acima
+      model: UserModel,
+      attributes: ["username", "firstname", "surname", "fullname"],
+      as: 'author'
+    },
+    where: {slug}
+  });
+  
+  return response.json(post);
+}
+
 module.exports = {
   CreatePost,
-  ListPosts
+  ListPosts,
+  PostBySlug
 };

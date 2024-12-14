@@ -14,7 +14,18 @@ const {
   DeleteUser,
 } = require("./controllers/UserController");
 
-const { CreatePost, ListPosts } = require("./controllers/PostsController");
+const { 
+  CreatePost, 
+  ListPosts,
+  PostBySlug 
+} = require("./controllers/PostsController");
+
+const { 
+  CreateTag, 
+  ListTags,
+  UpdateTag,
+  DeleteTag
+} = require("./controllers/TagsController");
 
 app.get("/", (request, response) => {
   response.end("Api backend do blog"); // .end já identifica que se trata de um conteúdo HTML
@@ -28,6 +39,12 @@ app.delete("/users/:id", DeleteUser);
 app.get("/posts", ListPosts);
 
 app.post("/posts", CreatePost);
+app.get("/posts/:slug", PostBySlug)
+
+app.post("/tags", CreateTag);
+app.get("/tags", ListTags);
+app.put("/tags/:id", UpdateTag);
+app.delete("/tags/:id", DeleteTag);
 
 // app.get('/post/:slug', (request,response) => {
 //     //console.log(request.params.slug);
